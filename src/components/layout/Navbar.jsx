@@ -29,23 +29,15 @@ const Navbar = () => {
         <div className="hidden md:flex gap-8 items-center">
           <Link to="/" className="text-medium font-medium hover:text-primary transition-colors">Home</Link>
           <Link to="/about" className="text-medium font-medium hover:text-primary transition-colors">About</Link>
-          {/* On Home page we can scroll, elsewhere we link to home */}
-          {location.pathname === '/' ? (
-            <>
-              <a href="#features" onClick={() => scrollToSection('features')} className="text-medium font-medium hover:text-primary transition-colors cursor-pointer">Features</a>
-              <a href="#pricing" onClick={() => scrollToSection('pricing')} className="text-medium font-medium hover:text-primary transition-colors cursor-pointer">Pricing</a>
-            </>
-          ) : (
-            <>
-              <Link to="/#features" className="text-medium font-medium hover:text-primary transition-colors">Features</Link>
-              <Link to="/#pricing" className="text-medium font-medium hover:text-primary transition-colors">Pricing</Link>
-            </>
-          )}
+          <Link to="/features" className="text-medium font-medium hover:text-primary transition-colors">Features</Link>
+          <Link to="/pricing" className="text-medium font-medium hover:text-primary transition-colors">Pricing</Link>
+          <Link to="/blog" className="text-medium font-medium hover:text-primary transition-colors">Blog</Link>
+          <Link to="/contact" className="text-medium font-medium hover:text-primary transition-colors">Contact</Link>
         </div>
 
         <div className="hidden md:flex gap-4 items-center">
-          <Link to="/login" className="btn btn-outline border-primary text-primary hover:bg-bg-light px-5 py-2 rounded-lg font-semibold transition-all">Log In</Link>
-          <Link to="/register" className="btn btn-primary bg-primary text-white hover:bg-primary-hover px-5 py-2 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">Get Started</Link>
+          <Link to="/dashboard" className="btn btn-outline border-primary text-primary hover:bg-bg-light px-5 py-2 rounded-lg font-semibold transition-all">Dashboard</Link>
+          <Link to="/auth" className="btn btn-primary bg-primary text-white hover:bg-primary-hover px-5 py-2 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">Get Started</Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -67,11 +59,13 @@ const Navbar = () => {
         <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 p-4 shadow-lg flex flex-col gap-4 md:hidden animate-fade-in-up">
           <Link to="/" onClick={() => setMobileMenuOpen(false)} className="text-center py-2 text-medium font-medium hover:text-primary">Home</Link>
           <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="text-center py-2 text-medium font-medium hover:text-primary">About</Link>
-          <a href="#features" onClick={() => scrollToSection('features')} className="text-center py-2 text-medium font-medium hover:text-primary">Features</a>
-          <a href="#pricing" onClick={() => scrollToSection('pricing')} className="text-center py-2 text-medium font-medium hover:text-primary">Pricing</a>
+          <Link to="/features" onClick={() => setMobileMenuOpen(false)} className="text-center py-2 text-medium font-medium hover:text-primary">Features</Link>
+          <Link to="/pricing" onClick={() => setMobileMenuOpen(false)} className="text-center py-2 text-medium font-medium hover:text-primary">Pricing</Link>
+          <Link to="/blog" onClick={() => setMobileMenuOpen(false)} className="text-center py-2 text-medium font-medium hover:text-primary">Blog</Link>
+          <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="text-center py-2 text-medium font-medium hover:text-primary">Contact</Link>
           <hr className="border-gray-100" />
-          <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="text-center py-2 font-semibold text-primary">Log In</Link>
-          <Link to="/register" className="btn btn-primary bg-primary text-white text-center py-3 rounded-lg font-semibold" onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
+          <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-center py-2 font-semibold text-primary">Dashboard</Link>
+          <Link to="/auth" className="btn btn-primary bg-primary text-white text-center py-3 rounded-lg font-semibold" onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
         </div>
       )}
     </nav>

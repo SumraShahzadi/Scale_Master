@@ -13,9 +13,9 @@ const Footer = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="flex flex-col">
               <h4 className="text-white mb-6 text-lg font-bold">Product</h4>
-              <a href="#features" className="block text-light mb-3 hover:text-secondary transition-colors duration-200">Features</a>
-              <a href="#pricing" className="block text-light mb-3 hover:text-secondary transition-colors duration-200">Pricing</a>
-              <a href="#roadmap" className="block text-light mb-3 hover:text-secondary transition-colors duration-200">Roadmap</a>
+              <Link to="/features" className="block text-light mb-3 hover:text-secondary transition-colors duration-200">Features</Link>
+              <Link to="/pricing" className="block text-light mb-3 hover:text-secondary transition-colors duration-200">Pricing</Link>
+              <Link to="/roadmap" className="block text-light mb-3 hover:text-secondary transition-colors duration-200">Roadmap</Link>
             </div>
 
             <div className="flex flex-col">

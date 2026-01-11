@@ -21,6 +21,16 @@ import Settings from './pages/Settings';
 import Help from './pages/Help';
 import Reports from './pages/Reports';
 import Devices from './pages/Devices';
+import Branches from './pages/Branches';
+import UsersRoles from './pages/UsersRoles';
+import Profile from './pages/Profile';
+import Notifications from './pages/Notifications';
+import LiveChat from './pages/LiveChat';
+import DailySummary from './pages/reports/DailySummary';
+import CustomerReport from './pages/reports/CustomerReport';
+import VehicleReport from './pages/reports/VehicleReport';
+import ProductSummary from './pages/reports/ProductSummary';
+import FinancialReport from './pages/reports/FinancialReport';
 import DashboardLayout from './components/layout/DashboardLayout';
 
 function App() {
@@ -46,7 +56,17 @@ function App() {
         <Route path="/settings" element={<DashboardLayout><Settings /></DashboardLayout>} />
         <Route path="/help" element={<DashboardLayout><Help /></DashboardLayout>} />
         <Route path="/reports" element={<DashboardLayout><Reports /></DashboardLayout>} />
+        <Route path="/reports/daily" element={<DashboardLayout><DailySummary /></DashboardLayout>} />
+        <Route path="/reports/customers" element={<DashboardLayout><CustomerReport /></DashboardLayout>} />
+        <Route path="/reports/vehicles" element={<DashboardLayout><VehicleReport /></DashboardLayout>} />
+        <Route path="/reports/products" element={<DashboardLayout><ProductSummary /></DashboardLayout>} />
+        <Route path="/reports/financial" element={<DashboardLayout><FinancialReport /></DashboardLayout>} />
         <Route path="/devices" element={<DashboardLayout><Devices /></DashboardLayout>} />
+        <Route path="/branches" element={<DashboardLayout><Branches /></DashboardLayout>} />
+        <Route path="/users" element={<DashboardLayout><UsersRoles /></DashboardLayout>} />
+        <Route path="/profile" element={<DashboardLayout><Profile /></DashboardLayout>} />
+        <Route path="/notifications" element={<DashboardLayout><Notifications /></DashboardLayout>} />
+        <Route path="/live-chat" element={<DashboardLayout><LiveChat /></DashboardLayout>} />
         <Route path="/auth" element={<Auth />} />
       </Routes>
     </Router>

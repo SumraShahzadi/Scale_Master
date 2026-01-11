@@ -1,26 +1,26 @@
 const Benefits = () => {
   const benefits = [
     {
-      title: "Real-time Analytics",
-      description: "Monitor your operations in real-time with advanced dashboards and reporting.",
-      icon: "📊",
+      title: "Digital Slips",
+      description: "Create digital weight slips with QR codes in seconds. No more lost paper.",
+      icon: "📄",
       delay: "0.1s"
     },
     {
-      title: "Automated Workflows",
-      description: "Save time by automating repetitive tasks and streamlining approval processes.",
-      icon: "⚡",
+      title: "Multi-Branch",
+      description: "Manage all your weighing stations and branches from one central dashboard.",
+      icon: "🏢",
       delay: "0.2s"
     },
     {
-      title: "Seamless Integration",
-      description: "Connect with your favorite tools via our robust API and pre-built integrations.",
-      icon: "🔄",
+      title: "Smart Reports",
+      description: "Automatic daily, weekly, and monthly reports to track cargo and efficiency.",
+      icon: "📊",
       delay: "0.3s"
     },
     {
-      title: "Enterprise Security",
-      description: "Bank-grade security protocols ensuring your data is always safe and compliant.",
+      title: "Secure Data",
+      description: "Keep your customer and vehicle data safe and accessible anytime.",
       icon: "🔒",
       delay: "0.4s"
     }
@@ -30,9 +30,9 @@ const Benefits = () => {
     <section className="py-32 bg-white relative" id="features">
       <div className="container mx-auto px-4">
         <div className="text-center mb-20">
-          <h2 className="text-4xl font-bold mb-4 text-dark animate-fade-in-up">Why Choose ScaleMaster?</h2>
+          <h2 className="text-4xl font-bold mb-4 text-dark animate-fade-in-up">All Features</h2>
           <p className="text-medium text-lg animate-fade-in-up animation-delay-100">
-            Everything you need to scale your business operations effectively.
+            Everything you need to digitize your weighing operations.
           </p>
         </div>
 
@@ -46,7 +46,7 @@ const Benefits = () => {
               {/* Hover Line Effect */}
               <div className="absolute top-0 left-0 w-1 h-0 bg-primary transition-[height] duration-300 group-hover:h-full"></div>
 
-              <div className="text-4xl mb-6 bg-bg-light w-[70px] h-[70px] flex items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-secondary group-hover:text-white">
+              <div className="text-4xl mb-6 bg-blue-50 w-[70px] h-[70px] flex items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-primary group-hover:text-white">
                 {benefit.icon}
               </div>
               <h3 className="mb-4 text-xl font-bold text-dark">{benefit.title}</h3>

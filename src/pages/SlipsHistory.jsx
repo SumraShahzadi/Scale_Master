@@ -1,245 +1,330 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const SlipsHistory = () => {
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
-    const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
-    const [selectedSlip, setSelectedSlip] = useState(null);
+    const [dateFilter, setDateFilter] = useState('');
 
-    // Mock Data
-    const slipsData = [
-        { id: 'SL-00451', date: '2023-11-08 14:30', customer: 'ABC Corp', vehicle: 'TRK-45B', material: 'Gravel', netWeight: 12300, status: 'Completed' },
-        { id: 'SL-00450', date: '2023-11-08 13:15', customer: 'XYZ Ltd', vehicle: 'TRK-19C', material: 'Sand', netWeight: 8100, status: 'Completed' },
-        { id: 'SL-00449', date: '2023-11-08 11:45', customer: 'City Builders', vehicle: 'TRK-22A', material: 'Asphalt', netWeight: 21500, status: 'Pending' },
-        { id: 'SL-00448', date: '2023-11-08 10:20', customer: 'Roadworks Inc', vehicle: 'TRK-07F', material: 'Gravel', netWeight: 15000, status: 'Void' },
-        { id: 'SL-00447', date: '2023-11-07 16:50', customer: 'ABC Corp', vehicle: 'TRK-45B', material: 'Concrete', netWeight: 18200, status: 'Completed' },
-        { id: 'SL-00446', date: '2023-11-07 15:10', customer: 'Private', vehicle: 'VAN-99X', material: 'Sand', netWeight: 4500, status: 'Completed' },
+    // Form styling constants
+    const labelClass = "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1";
+    const inputClass = "w-full bg-blue-50/50 backdrop-blur-sm border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-700 font-medium focus:border-blue-500 focus:bg-white focus:ring-1 focus:ring-blue-500 transition-all outline-none";
+
+    // Form State (Mock for UI)
+    const [firstWeightForm, setFirstWeightForm] = useState({
+        customerType: 'Commercial',
+        voucherNo: '',
+        serialNo: '1001',
+        inDate: new Date().toISOString().split('T')[0],
+        inTime: '',
+        vehicle: '',
+        material: '',
+        partyName: '',
+        supplierName: '',
+        driver: '',
+        phone: '',
+        amount: '',
+        paid: 'No',
+        packing: '',
+        remarks: '',
+        weight1: 0,
+        printType: 'DOS Print'
+    });
+
+    const [isAutoWeight, setIsAutoWeight] = useState(true);
+    const [liveWeight, setLiveWeight] = useState(0);
+
+    // Effect to simulate live weight
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setLiveWeight(Math.floor(Math.random() * 500) + 40000);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Sync live weight if auto
+    useEffect(() => {
+        if (isAutoWeight) {
+            setFirstWeightForm(prev => ({ ...prev, weight1: liveWeight }));
+        }
+    }, [liveWeight, isAutoWeight]);
+
+
+    // Mock Data - History
+    const slips = [
+        { id: "SL-4021", date: "2024-03-10", vehicle: "KAB-902", customer: "Ali Traders", product: "Gravel", net: "42,500", status: "Completed" },
+        { id: "SL-4020", date: "2024-03-10", vehicle: "LER-112", customer: "Fast Logistics", product: "Sand", net: "--", status: "Pending" },
+        { id: "SL-4019", date: "2024-03-09", vehicle: "MNB-778", customer: "City Construction", product: "Cement", net: "38,100", status: "Completed" },
+        { id: "SL-4018", date: "2024-03-09", vehicle: "RIO-554", customer: "Walk-in", product: "Gravel", net: "12,200", status: "Completed" },
+        { id: "SL-4017", date: "2024-03-09", vehicle: "TKS-990", customer: "Agri Corp", product: "Wheat", net: "0", status: "Error" },
+        { id: "SL-4016", date: "2024-03-08", vehicle: "NYC-101", customer: "Global Trade", product: "Steel", net: "25,000", status: "Completed" },
+        { id: "SL-4015", date: "2024-03-08", vehicle: "LAX-202", customer: "Metro Builders", product: "Sand", net: "18,400", status: "Completed" },
     ];
 
-    // Filter & Sort Logic
-    const filteredData = useMemo(() => {
-        let data = [...slipsData];
+    // Filter Logic
+    const filteredSlips = slips.filter(slip => {
+        const matchesSearch =
+            slip.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            slip.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            slip.customer.toLowerCase().includes(searchTerm.toLowerCase());
 
-        if (searchTerm) {
-            data = data.filter(slip =>
-                slip.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                slip.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                slip.id.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        }
+        const matchesStatus = statusFilter === 'All' || slip.status === statusFilter;
+        const matchesDate = !dateFilter || slip.date === dateFilter;
 
-        if (statusFilter !== 'All') {
-            data = data.filter(slip => slip.status === statusFilter);
-        }
+        return matchesSearch && matchesStatus && matchesDate;
+    });
 
-        if (sortConfig.key) {
-            data.sort((a, b) => {
-                if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
-                if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-        }
-
-        return data;
-    }, [slipsData, searchTerm, statusFilter, sortConfig]);
-
-    const handleSort = (key) => {
-        let direction = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'Completed': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
-            case 'Pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
-            case 'Void': return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
-            default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-        }
-    };
+    const handlePrint = (id) => {
+        alert(`Printing Slip #${id}...`);
+    }
 
     return (
-        <div className="flex flex-col gap-6">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col gap-6 h-full overflow-y-auto">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-text-light dark:text-text-dark">Slips History</h1>
-                    <p className="text-sm text-text-muted-light dark:text-text-muted-dark">Manage and view all weighing records</p>
+                    <h1 className="text-2xl font-bold text-dark dark:text-white">Slips History</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage and export your weighing records.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark rounded-lg text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                        <span className="material-symbols-outlined text-xl">file_download</span>
+                <div className="flex gap-2">
+                    <button className="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-sm font-bold text-dark dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2 transition-colors">
+                        <span className="material-icons-outlined text-lg">download</span>
                         Export CSV
                     </button>
-                    <a href="/create-slip" className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
-                        <span className="material-symbols-outlined text-xl">add</span>
-                        Create Slip
-                    </a>
+                    <button
+                        onClick={() => navigate('/create-slip')}
+                        className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-hover flex items-center gap-2 shadow-sm shadow-primary/30 transition-all"
+                    >
+                        <span className="material-icons-outlined text-lg">add</span>
+                        New Slip
+                    </button>
                 </div>
             </div>
 
-            {/* Stats Summary - Dynamic Touch */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800">
-                    <p className="text-xs font-semibold uppercase text-blue-600 dark:text-blue-400">Total Slips Today</p>
-                    <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">145</p>
+            {/* TOP SECTION: 1ST WEIGHT FORM FIELDS */}
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <h2 className="text-lg font-bold mb-4 text-primary flex items-center gap-2">
+                    <span className="material-icons-outlined">input</span>
+                    New First Weight Entry
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+                    {/* Row 0: Type & Voucher */}
+                    <div>
+                        <label className={labelClass}>Customer Type</label>
+                        <select
+                            value={firstWeightForm.customerType}
+                            onChange={e => setFirstWeightForm({ ...firstWeightForm, customerType: e.target.value })}
+                            className={inputClass}
+                        >
+                            <option>Commercial</option>
+                            <option>Company</option>
+                        </select>
+                    </div>
+                    <div><label className={labelClass}>Voucher No</label><input type="text" value={firstWeightForm.voucherNo} onChange={e => setFirstWeightForm({ ...firstWeightForm, voucherNo: e.target.value })} className={inputClass} placeholder="Optional" /></div>
+
+                    {/* Row 1 */}
+                    <div><label className={labelClass}>Serial No (Auto)</label><input type="text" value={firstWeightForm.serialNo} readOnly className={`${inputClass} bg-slate-100`} /></div>
+                    <div><label className={labelClass}>IN Date / Time</label><div className="flex gap-2"><input type="date" value={firstWeightForm.inDate} className={inputClass} /><input type="time" value={firstWeightForm.inTime} className={inputClass} /></div></div>
+
+                    {/* Row 2 */}
+                    <div><label className={labelClass}>Vehicle No</label><input type="text" value={firstWeightForm.vehicle} onChange={e => setFirstWeightForm({ ...firstWeightForm, vehicle: e.target.value })} className={inputClass} placeholder="e.g. LES-1234" /></div>
+                    <div>
+                        <label className={labelClass}>Material / Product</label>
+                        <select className={inputClass} value={firstWeightForm.material} onChange={e => setFirstWeightForm({ ...firstWeightForm, material: e.target.value })}>
+                            <option value="">Select Material</option>
+                            <option>Sand</option>
+                            <option>Cement</option>
+                            <option>Bricks</option>
+                        </select>
+                    </div>
+
+                    {/* Row 3 */}
+                    <div><label className={labelClass}>Party Name</label><input type="text" value={firstWeightForm.partyName} onChange={e => setFirstWeightForm({ ...firstWeightForm, partyName: e.target.value })} className={inputClass} /></div>
+                    <div><label className={labelClass}>Supplier Name</label><input type="text" value={firstWeightForm.supplierName} onChange={e => setFirstWeightForm({ ...firstWeightForm, supplierName: e.target.value })} className={inputClass} /></div>
+
+                    {/* Row 4 */}
+                    <div><label className={labelClass}>Driver Name</label><input type="text" value={firstWeightForm.driver} onChange={e => setFirstWeightForm({ ...firstWeightForm, driver: e.target.value })} className={inputClass} /></div>
+                    <div><label className={labelClass}>Phone No (Auto)</label><input type="text" value={firstWeightForm.phone} className={`${inputClass} bg-slate-50`} placeholder="Auto-filled" readOnly /></div>
+
+                    {/* Row 5 */}
+                    <div><label className={labelClass}>Charges Amount</label><input type="number" value={firstWeightForm.amount} onChange={e => setFirstWeightForm({ ...firstWeightForm, amount: e.target.value })} className={inputClass} /></div>
+                    <div>
+                        <label className={labelClass}>Paid?</label>
+                        <div className="flex gap-4 mt-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="paid" value="Yes" checked={firstWeightForm.paid === 'Yes'} onChange={() => setFirstWeightForm({ ...firstWeightForm, paid: 'Yes' })} className="accent-primary" />
+                                <span className="text-sm font-medium">Yes</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="paid" value="No" checked={firstWeightForm.paid === 'No'} onChange={() => setFirstWeightForm({ ...firstWeightForm, paid: 'No' })} className="accent-red-500" />
+                                <span className="text-sm font-medium">No</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Row 6 */}
+                    <div><label className={labelClass}>Packing / Bags</label><input type="text" value={firstWeightForm.packing} onChange={e => setFirstWeightForm({ ...firstWeightForm, packing: e.target.value })} className={inputClass} /></div>
+                    <div><label className={labelClass}>Remarks</label><input type="text" value={firstWeightForm.remarks} onChange={e => setFirstWeightForm({ ...firstWeightForm, remarks: e.target.value })} className={inputClass} /></div>
                 </div>
-                <div className="p-4 rounded-lg bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border border-green-200 dark:border-green-800">
-                    <p className="text-xs font-semibold uppercase text-green-600 dark:text-green-400">Total Weight</p>
-                    <p className="text-2xl font-bold text-green-900 dark:text-green-100">1,240 t</p>
+
+                {/* Weight Section (Integrated) */}
+                <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <label className={`${labelClass} text-lg !text-primary mb-2 block`}>1st Weight</label>
+                    <div className="flex gap-2 mb-2">
+                        <button onClick={() => setIsAutoWeight(false)} className={`flex-1 py-1 px-2 text-xs font-bold rounded uppercase ${!isAutoWeight ? 'bg-slate-600 text-white' : 'bg-white border text-slate-500'}`}>Manual</button>
+                        <button onClick={() => setIsAutoWeight(true)} className={`flex-1 py-1 px-2 text-xs font-bold rounded uppercase ${isAutoWeight ? 'bg-primary text-white' : 'bg-white border text-slate-500'}`}>Auto</button>
+                    </div>
+                    <div className="relative">
+                        <input
+                            type="number"
+                            value={firstWeightForm.weight1}
+                            readOnly={isAutoWeight}
+                            onChange={e => setFirstWeightForm({ ...firstWeightForm, weight1: e.target.value })}
+                            className="w-full text-3xl font-mono font-bold text-center py-3 rounded-lg border-2 border-slate-300 focus:border-primary outline-none"
+                        />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">KG</span>
+                    </div>
                 </div>
-                <div className="p-4 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border border-purple-200 dark:border-purple-800">
-                    <p className="text-xs font-semibold uppercase text-purple-600 dark:text-purple-400">Completed</p>
-                    <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">98%</p>
+
+                {/* Actions */}
+                <div className="mt-8 pt-4 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="print" checked={firstWeightForm.printType === 'DOS Print'} onChange={() => setFirstWeightForm({ ...firstWeightForm, printType: 'DOS Print' })} className="accent-primary" />
+                            <span className="text-sm font-bold">DOS Print</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="print" checked={firstWeightForm.printType === 'Win Print'} onChange={() => setFirstWeightForm({ ...firstWeightForm, printType: 'Win Print' })} className="accent-primary" />
+                            <span className="text-sm font-bold">Win Print</span>
+                        </label>
+                    </div>
+                    <div className="flex gap-3 w-full md:w-auto">
+                        <button className="flex-1 md:flex-none px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-200 transition-colors">Save Only</button>
+                        <button className="flex-1 md:flex-none px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary-hover shadow-lg shadow-blue-500/30 transition-colors flex items-center justify-center gap-2">
+                            <span className="material-icons-outlined">print</span>
+                            Save & Print
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            {/* Filters Bar */}
-            <div className="flex flex-col md:flex-row gap-4 p-4 rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm">
-                <div className="flex-1 relative group">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted-light dark:text-text-muted-dark group-focus-within:text-primary transition-colors">search</span>
-                    <input
-                        type="text"
-                        placeholder="Search by Customer, Vehicle, ID..."
-                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-sm"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <select
-                    className="px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-2 focus:ring-primary outline-none text-sm font-medium"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                    <option value="All">All Statuses</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Void">Void</option>
-                </select>
-                <div className="relative">
-                    <input
-                        type="date"
-                        className="px-4 py-2 rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark focus:ring-2 focus:ring-primary outline-none text-sm font-medium w-full md:w-auto"
-                    />
-                </div>
-            </div>
+            {/* DIVIDER */}
+            <div className="border-t border-slate-200 dark:border-slate-700 my-2"></div>
 
-            {/* Table */}
-            <div className="rounded-lg bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-background-light dark:bg-background-dark/50 border-b border-border-light dark:border-border-dark text-xs text-text-muted-light dark:text-text-muted-dark uppercase tracking-wider font-semibold">
-                            <tr>
-                                <th className="px-6 py-4 cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('id')}>Slip ID {sortConfig.key === 'id' && (sortConfig.direction === 'asc' ? '↑' : '↓')}</th>
-                                <th className="px-6 py-4 cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('date')}>Date/Time {sortConfig.key === 'date' && (sortConfig.direction === 'asc' ? '↑' : '↓')}</th>
-                                <th className="px-6 py-4 cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('customer')}>Customer {sortConfig.key === 'customer' && (sortConfig.direction === 'asc' ? '↑' : '↓')}</th>
-                                <th className="px-6 py-4">Vehicle</th>
-                                <th className="px-6 py-4">Material</th>
-                                <th className="px-6 py-4 text-right cursor-pointer hover:text-primary transition-colors" onClick={() => handleSort('netWeight')}>Net Weight {sortConfig.key === 'netWeight' && (sortConfig.direction === 'asc' ? '↑' : '↓')}</th>
-                                <th className="px-6 py-4 text-center">Status</th>
-                                <th className="px-6 py-4 text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border-light dark:divide-border-dark">
-                            {filteredData.map((slip) => (
-                                <tr key={slip.id} className="group hover:bg-background-light dark:hover:bg-background-dark/30 transition-colors">
-                                    <td className="px-6 py-4 font-medium text-primary cursor-pointer hover:underline" onClick={() => setSelectedSlip(slip)}>{slip.id}</td>
-                                    <td className="px-6 py-4 text-text-light dark:text-text-dark">{slip.date}</td>
-                                    <td className="px-6 py-4 text-text-light dark:text-text-dark font-medium">{slip.customer}</td>
-                                    <td className="px-6 py-4 text-text-muted-light dark:text-text-muted-dark font-mono text-xs">{slip.vehicle}</td>
-                                    <td className="px-6 py-4 text-text-light dark:text-text-dark">{slip.material}</td>
-                                    <td className="px-6 py-4 text-right font-medium text-text-light dark:text-text-dark">{slip.netWeight.toLocaleString()} kg</td>
-                                    <td className="px-6 py-4 text-center">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full ${getStatusColor(slip.status)}`}>
-                                            {slip.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded text-text-muted-light dark:text-text-muted-dark hover:text-primary" title="View Details" onClick={() => setSelectedSlip(slip)}>
-                                                <span className="material-symbols-outlined text-lg">visibility</span>
-                                            </button>
-                                            <button className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded text-text-muted-light dark:text-text-muted-dark hover:text-primary" title="Print">
-                                                <span className="material-symbols-outlined text-lg">print</span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                            {filteredData.length === 0 && (
+            {/* BOTTOM SECTION: Filters & All History */}
+            <div className="flex flex-col gap-4">
+                <h2 className="text-lg font-bold text-dark dark:text-white">All Records History</h2>
+
+                {/* Filters */}
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm flex flex-col md:flex-row gap-4 items-center">
+                    <div className="relative flex-1 w-full">
+                        <span className="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                        <input
+                            type="text"
+                            placeholder="Search by Slip ID, Vehicle, or Customer..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-sm dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:border-primary outline-none transition-colors"
+                        />
+                    </div>
+
+                    <div className="flex gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="px-4 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 focus:border-primary outline-none cursor-pointer"
+                        >
+                            <option value="All">All Status</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Error">Error</option>
+                        </select>
+
+                        <input
+                            type="date"
+                            value={dateFilter}
+                            onChange={(e) => setDateFilter(e.target.value)}
+                            className="px-4 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-sm font-medium text-gray-600 dark:text-slate-300 focus:border-primary outline-none cursor-pointer"
+                        />
+                    </div>
+                </div>
+
+                {/* Table */}
+                <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-gray-50/50 dark:bg-slate-700/50 text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-slate-700">
                                 <tr>
-                                    <td colSpan="8" className="px-6 py-12 text-center text-text-muted-light dark:text-text-muted-dark">
-                                        No slips found matching your criteria.
-                                    </td>
+                                    <th className="px-6 py-4">Slip ID</th>
+                                    <th className="px-6 py-4">Date</th>
+                                    <th className="px-6 py-4">Vehicle</th>
+                                    <th className="px-6 py-4">Customer</th>
+                                    <th className="px-6 py-4">Product</th>
+                                    <th className="px-6 py-4">Net Weight</th>
+                                    <th className="px-6 py-4">Status</th>
+                                    <th className="px-6 py-4 text-right">Actions</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-                {/* Pagination Mock */}
-                <div className="flex justify-between items-center p-4 border-t border-border-light dark:border-border-dark">
-                    <span className="text-sm text-text-muted-light dark:text-text-muted-dark">Showing {filteredData.length > 0 ? 1 : 0} to {filteredData.length} of {filteredData.length} results</span>
-                    <div className="flex gap-2">
-                        <button disabled className="px-3 py-1 rounded border border-border-light dark:border-border-dark text-sm bg-background-light dark:bg-background-dark text-text-muted-light disabled:opacity-50">Previous</button>
-                        <button disabled className="px-3 py-1 rounded border border-border-light dark:border-border-dark text-sm bg-background-light dark:bg-background-dark text-text-muted-light disabled:opacity-50">Next</button>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                                {filteredSlips.map((slip) => (
+                                    <tr key={slip.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors group">
+                                        <td className="px-6 py-4 font-bold text-dark dark:text-white">{slip.id}</td>
+                                        <td className="px-6 py-4 text-gray-500 dark:text-slate-400">{slip.date}</td>
+                                        <td className="px-6 py-4 font-medium text-dark dark:text-slate-200">{slip.vehicle}</td>
+                                        <td className="px-6 py-4 text-gray-600 dark:text-slate-300">{slip.customer}</td>
+                                        <td className="px-6 py-4">
+                                            <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded text-xs font-bold border border-blue-100 dark:border-blue-800">{slip.product}</span>
+                                        </td>
+                                        <td className="px-6 py-4 font-mono font-bold text-dark dark:text-slate-200">{slip.net} kg</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full border 
+                                            ${slip.status === 'Completed' ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-900' :
+                                                    slip.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-900' :
+                                                        'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-900'}`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${slip.status === 'Completed' ? 'bg-green-500' : slip.status === 'Pending' ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
+                                                {slip.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button className="p-1 text-gray-400 hover:text-primary transition-colors" title="View">
+                                                    <span className="material-icons-outlined text-lg">visibility</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => handlePrint(slip.id)}
+                                                    className="p-1 text-gray-400 hover:text-dark dark:hover:text-white transition-colors" title="Print"
+                                                >
+                                                    <span className="material-icons-outlined text-lg">print</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {filteredSlips.length === 0 && (
+                                    <tr>
+                                        <td colSpan="8" className="px-6 py-8 text-center text-gray-500 dark:text-slate-400 text-sm">
+                                            No slips found matching your filters.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="px-6 py-4 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center text-xs text-gray-500 dark:text-slate-400">
+                        <span>Showing {filteredSlips.length} of {slips.length} slips</span>
+                        <div className="flex gap-2">
+                            <button className="px-3 py-1 border border-gray-200 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50">Previous</button>
+                            <button className="px-3 py-1 bg-primary text-white rounded shadow-sm">1</button>
+                            <button className="px-3 py-1 border border-gray-200 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700">2</button>
+                            <button className="px-3 py-1 border border-gray-200 dark:border-slate-600 rounded hover:bg-gray-50 dark:hover:bg-slate-700">Next</button>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {/* Quick View Modal */}
-            {selectedSlip && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedSlip(null)}>
-                    <div className="bg-white dark:bg-card-dark rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-between items-center p-6 border-b border-border-light dark:border-border-dark">
-                            <h3 className="text-xl font-bold">Slip Details</h3>
-                            <button onClick={() => setSelectedSlip(null)} className="text-text-muted-light hover:text-text-light dark:hover:text-text-dark">
-                                <span className="material-symbols-outlined">close</span>
-                            </button>
-                        </div>
-                        <div className="p-6 flex flex-col gap-4">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <p className="text-sm text-text-muted-light dark:text-text-muted-dark">Slip ID</p>
-                                    <p className="text-lg font-bold font-mono">{selectedSlip.id}</p>
-                                </div>
-                                <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedSlip.status)}`}>
-                                    {selectedSlip.status}
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-sm text-text-muted-light dark:text-text-muted-dark">Customer</p>
-                                    <p className="font-medium">{selectedSlip.customer}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-text-muted-light dark:text-text-muted-dark">Vehicle</p>
-                                    <p className="font-medium">{selectedSlip.vehicle}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-text-muted-light dark:text-text-muted-dark">Material</p>
-                                    <p className="font-medium">{selectedSlip.material}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-text-muted-light dark:text-text-muted-dark">Date</p>
-                                    <p className="font-medium">{selectedSlip.date}</p>
-                                </div>
-                            </div>
-                            <div className="p-4 bg-background-light dark:bg-background-dark rounded-lg flex justify-between items-center mt-2">
-                                <span className="font-medium">Net Weight</span>
-                                <span className="text-xl font-bold text-primary">{selectedSlip.netWeight.toLocaleString()} kg</span>
-                            </div>
-                        </div>
-                        <div className="p-6 bg-background-light dark:bg-background-dark/50 border-t border-border-light dark:border-border-dark flex justify-end gap-3">
-                            <button className="px-4 py-2 text-sm font-medium text-text-light dark:text-text-dark hover:bg-black/5 dark:hover:bg-white/5 rounded-lg" onClick={() => setSelectedSlip(null)}>Close</button>
-                            <button className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg flex items-center gap-2">
-                                <span className="material-symbols-outlined text-lg">print</span> Print Slip
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

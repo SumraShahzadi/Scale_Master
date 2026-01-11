@@ -33,11 +33,12 @@ const Navbar = () => {
           <Link to="/pricing" className="text-medium font-medium hover:text-primary transition-colors">Pricing</Link>
           <Link to="/blog" className="text-medium font-medium hover:text-primary transition-colors">Blog</Link>
           <Link to="/contact" className="text-medium font-medium hover:text-primary transition-colors">Contact</Link>
+          <Link to="/dashboard" className="text-medium font-medium hover:text-primary transition-colors">Dashboard</Link>
         </div>
 
         <div className="hidden md:flex gap-4 items-center">
-          <Link to="/dashboard" className="btn btn-outline border-primary text-primary hover:bg-bg-light px-5 py-2 rounded-lg font-semibold transition-all">Dashboard</Link>
-          <Link to="/auth" className="btn btn-primary bg-primary text-white hover:bg-primary-hover px-5 py-2 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">Get Started</Link>
+          <Link to="/auth" className="text-medium font-medium hover:text-primary transition-colors">Login</Link>
+          <Link to="/auth" className="btn btn-primary bg-primary text-white hover:bg-primary-hover px-6 py-2.5 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">Sign Up</Link>
         </div>
 
         {/* Mobile Menu Button */}

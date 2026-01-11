@@ -8,16 +8,29 @@ export default {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: '#1A374D',
-                    hover: '#142a3b',
+                    DEFAULT: '#2563EB', // Primary Blue
+                    hover: '#1E40AF',   // Dark Blue
+                    light: '#DBEAFE',   // Light Blue
                 },
-                secondary: '#406882',
-                accent: '#6998AB',
-                dark: '#1A374D',
-                medium: '#406882',
-                light: '#6998AB',
-                'bg-light': '#F5F9FC',
-                'bg-dark': '#1A374D',
+                secondary: '#1E40AF', // Dark Blue
+                accent: '#DBEAFE',    // Light Blue
+
+                // Neutrals
+                dark: '#1F2937',      // Dark Gray (Text)
+                medium: '#6B7280',    // Medium Gray (Secondary Text)
+                light: '#F9FAFB',     // Light Gray (Backgrounds)
+                white: '#FFFFFF',
+                border: '#E5E7EB',    // Border Gray
+
+                // Feedback
+                success: '#10B981',
+                warning: '#F59E0B',
+                error: '#EF4444',
+                info: '#8B5CF6',
+
+                // Custom Backgrounds
+                'bg-light': '#F9FAFB',
+                'bg-dark': '#1F2937',
             },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],

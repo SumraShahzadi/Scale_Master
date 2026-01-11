@@ -2,26 +2,26 @@ const Testimonials = () => {
   const testimonials = [
     {
       id: 1,
-      name: "Sarah Jenkins",
-      role: "COO, TechFlow",
-      content: "ScaleMaster transformed how we handle operations. The automation features alone saved us 20 hours a week.",
-      avatar: "SJ",
+      name: "Ahmed Khan",
+      role: "Owner, City Weighbridge",
+      content: "This saved us 5 hours daily. No more writing slips by hand or calculating totals manually.",
+      avatar: "AK",
       delay: "0.1s"
     },
     {
       id: 2,
-      name: "Michael Chen",
-      role: "Founder, StartUp Inc",
-      content: "Incredible platform. The UI is intuitive and the customer support is top-notch. Highly recommended!",
-      avatar: "MC",
+      name: "John Smith",
+      role: "Logistics Manager",
+      content: "The multi-branch feature is amazing. I can see what's happening at all my stations from my phone.",
+      avatar: "JS",
       delay: "0.2s"
     },
     {
       id: 3,
-      name: "Elena Rodriguez",
-      role: "Director, Enterprise Solutions",
-      content: "We needed a scalable solution that could grow with us. ScaleMaster delivered exactly that and more.",
-      avatar: "ER",
+      name: "Fatima Ali",
+      role: "Factory Owner",
+      content: "Simple, fast, and reliable. My operators learned it in minutes. Highly recommended!",
+      avatar: "FA",
       delay: "0.3s"
     }
   ];

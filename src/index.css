@@ -8,6 +8,24 @@
   body {
     @apply font-sans text-dark bg-white;
   }
+
+  /* Custom Scrollbar - Light Blue Theme */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-blue-50;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-blue-300 rounded-full border-2 border-blue-50;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
 }
 
 @layer utilities {
